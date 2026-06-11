@@ -1,0 +1,30 @@
+bankarski_cli_sistem/
+├── pyproject.toml           # Konfiguracija projekta i upravljanje zavisnostima (uv)
+├── main.py                  # Ulazna tačka aplikacije (Entry point)
+├── core/                    # Esencijalni mehanizmi sistema
+│   ├── __init__.py
+│   ├── exceptions.py        # Custom error handling (npr. NedovoljnoSredstavaError, RacunBlokiranError)
+│   ├── events.py            # EventBus implementacija (Observer pattern)
+│   └── decorators.py        # Dekoratori (npr. isplatiti_sa_provizijom)
+├── models/                  # Domen aplikacije (Samo struktura podataka i osnovna logika)
+│   ├── __init__.py
+│   ├── enums.py             # TipRacuna, Valuta, Uloga, StatusRacuna  
+│   ├── korisnik.py          # Klase: Korisnik, Direktor, Radnik, Klijent
+│   ├── racun.py             # Klase računa i tranziciona mapa (State pattern)
+│   └── transakcija.py       # Model za beleženje promena stanja
+├── repository/              # Sloj za perzistenciju podataka (Repository pattern)
+│   ├── __init__.py
+│   ├── interfaces.py        # Apstraktne klase (@abstractmethod) za KorisnikRepo, RacunRepo
+│   ├── memory.py            # In-memory dict/list implementacija (Faza 1)
+│   └── sqlite.py            # SQLite implementacija (Faza 2)
+├── services/                # Biznis logika sistema (Services)
+│   ├── __init__.py
+│   ├── banka.py             # Centralna Banka klasa (Singleton)
+│   ├── racun_service.py     # Logika otvaranja (Factory),
+│   ├── kamata_service.py    # Obračun kamate (Strategy pattern)
+│   └── auth_service.py      # Autentifikacija, seed korisnici i role
+└── cli/                     # Prezentacioni sloj (Isključivo prikaz i unos)
+    ├── __init__.py
+    ├── app.py               # Inicijalizacija CLI aplikacije
+    ├── menus.py             # Logika menija za direktora, radnika, klijenta
+    └── views.py             # Formatiranje tabele i panela pomoću 'rich' biblioteke
