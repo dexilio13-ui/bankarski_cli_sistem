@@ -33,10 +33,16 @@ class AuthService:
     def _generisi_inicijalne_korisnike(self) -> List[Korisnik]:
         """Pomoćna metoda koja vraća listu podrazumevanih sistemskih korisnika."""
         return [
-            Direktor(ime="Marko", prezime="Kraljević", username="admin", password="admin123"),
-            Radnik(ime="Jovan", prezime="Jovanović", username="radnik1", password="pass1"),
+            Direktor(
+                ime="Marko", prezime="Kraljević", username="admin", password="admin123"
+            ),
+            Radnik(
+                ime="Jovan", prezime="Jovanović", username="radnik1", password="pass1"
+            ),
             Radnik(ime="Ana", prezime="Anić", username="radnik2", password="pass2"),
-            Klijent(ime="Pera", prezime="Perić", username="pera1", password="klijentpass1"),
+            Klijent(
+                ime="Pera", prezime="Perić", username="pera1", password="klijentpass1"
+            ),
         ]
 
     def _snimi_ako_nedostaje(self, korisnik: Korisnik) -> None:

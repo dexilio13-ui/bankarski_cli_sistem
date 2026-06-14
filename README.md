@@ -1,39 +1,5 @@
         >>>  Projektni zadatak : Bankarski CLI Sistem  <<<
 
-STRUKTURA DIREKTORIJUMA i FAJLOVA:
---------------------------------
-
-bankarski_cli_sistem/
-├── pyproject.toml           # Konfiguracija projekta i upravljanje zavisnostima (uv)
-├── main.py                  # Ulazna tačka aplikacije (Entry point)
-├── core/                    # Esencijalni mehanizmi sistema
-│   ├── __init__.py
-│   ├── exceptions.py        # Custom error handling (npr. NedovoljnoSredstavaError, RacunBlokiranError)
-│   ├── events.py            # EventBus implementacija (Observer pattern)
-│   └── decorators.py        # Dekoratori (npr. isplatiti_sa_provizijom)
-├── models/                  # Domen aplikacije (Samo struktura podataka i osnovna logika)
-│   ├── __init__.py
-│   ├── enums.py             # TipRacuna, Valuta, Uloga, StatusRacuna  
-│   ├── korisnik.py          # Klase: Korisnik, Direktor, Radnik, Klijent
-│   ├── racun.py             # Klase računa i tranziciona mapa (State pattern)
-│   └── transakcija.py       # Model za beleženje promena stanja
-├── repository/              # Sloj za perzistenciju podataka (Repository pattern)
-│   ├── __init__.py
-│   ├── interfaces.py        # Apstraktne klase (@abstractmethod) za KorisnikRepo, RacunRepo
-│   ├── memory.py            # In-memory dict/list implementacija (Faza 1)
-│   └── sqlite.py            # SQLite implementacija (Faza 2)
-├── services/                # Biznis logika sistema (Services)
-│   ├── __init__.py
-│   ├── banka.py             # Centralna Banka klasa (Singleton)
-│   ├── racun_service.py     # Logika otvaranja (Factory),
-│   ├── kamata_service.py    # Obračun kamate (Strategy pattern)
-│   └── auth_service.py      # Autentifikacija, seed korisnici i role
-└── cli/                     # Prezentacioni sloj (Isključivo prikaz i unos)
-    ├── __init__.py
-    ├── app.py               # Inicijalizacija CLI aplikacije
-    ├── menus.py             # Logika menija za direktora, radnika, klijenta
-    └── views.py             # Formatiranje tabele i panela pomoću 'rich' biblioteke
----------------------------------------------------------------------------------------
 
 
 ### Sta je uradjeno do sada ###
@@ -46,83 +12,237 @@ Faza 2 - Zavrsena
 
 --------------------------------
 
+# Uputstvo za testiranje — Bankarski CLI Sistem
 
-PRIMER KORISCENJA:
------------------
+## Pokretanje
 
-1 Korak: Radnik (Registracija i Otvaranje računa)
+```powershell
+cd E:\bankarski_cli_sistem
+.venv\Scripts\activate
+python main.py
+```
 
-Prvo ćemo napraviti klijenta da imamo šta da testiramo.
+---
 
-Prijava: Izaberi 1.
+## Kredencijali (seed podaci)
 
-Username: radnik
+| Uloga | Username | Lozinka | Ime |
+|---|---|---|---|
+| Direktor | `admin` | `admin123` | Marko Kraljević |
+| Radnik | `radnik1` | `pass1` | Jovan Jovanović |
+| Radnik | `radnik2` | `pass2` | Ana Anić |
+| Klijent | `pera` | `pera123` | Pera Perić |
+| Klijent | `mika` | `mika123` | Mika Mikić |
+| Klijent | `zika` | `zika123` | Žika Žikić |
 
-Lozinka: radnik123
+---
 
-Registracija klijenta (Opcija 3):
+## TEST 1 — Radnik: Registracija novog klijenta
 
-Unesi ime: Pera, prezime: Perić, username: pera, lozinka: pera123.
+**Prijava:**
+```
+>>> 1
+Korisničko ime: radnik1
+Lozinka: pass1
+```
 
-VAŽNO: Sistem će ispisati ID klijenta. Zapiši ga negde (ili kopiraj), trebaće ti odmah!
+**Registracija (opcija 3):**
+```
+>>> 3
+Ime klijenta: Nikola
+Prezime klijenta: Nikolić
+Korisničko ime: nikola
+Lozinka: nikola123
+```
 
+**Očekivani rezultat:**
+```
+✅ USPEH: Klijent registrovan! ID: <uuid>
+```
+> ⚠️ Zapiši ispisani ID — treba ti u sledećem koraku!
 
-Otvaranje računa (Opcija 1):
+---
 
-Unesi ID klijenta koji si malopre zapisao.
+## TEST 2 — Radnik: Otvaranje računa novom klijentu
 
-Tip računa: TEKUCI
+Dok si još prijavljen kao `radnik1`, izaberi opciju 1:
 
-Valuta: RSD
+```
+>>> 1
+ID klijenta: <ID iz testa 1>
+Tip (tekuci/stedni/poslovni): tekuci
+Valuta (rsd/eur/usd): rsd
+```
 
-Odjava: Izaberi 0.
------------------------------------
+**Očekivani rezultat:**
+```
+✅ USPEH: Uspešno otvoren račun: <uuid>
+```
 
-2. Korak: Klijent (Transakcije)
-Sada ćemo proveriti da li tvoj sistem ispravno beleži uplate.
+---
 
-Prijava: Izaberi 1.
+## TEST 3 — Radnik: Pregled klijenata i računa
 
-Username: pera
+```
+>>> 5
+```
 
+**Očekivani rezultat:** Rich tabela sa svim klijentima (Pera, Mika, Žika, Nikola) i njihovim računima. Nikola treba da ima tekući RSD račun sa stanjem `0.00`.
+
+---
+
+## TEST 4 — Klijent: Uplata, isplata i transfer
+
+**Prijava kao Nikola:**
+```
+>>> 1
+Korisničko ime: nikola
+Lozinka: nikola123
+```
+
+**Pregled računa (opcija 1):**
+```
+>>> 1
+```
+Vidiš tekući račun sa stanjem `0.00 rsd`. Zapiši ID računa.
+
+**Uplata (opcija 2):**
+```
+>>> 2
+ID računa: <ID iz pregleda>
+Iznos uplate: 10000
+```
+**Očekivani rezultat:** `✅ USPEH: Uplata od 10000.00 uspešno izvršena.`
+
+**Provera (opcija 1):** Stanje mora biti `10000.00 rsd`.
+
+**Isplata (opcija 3):**
+```
+>>> 3
+ID računa: <isti ID>
+Iznos isplate: 3000
+```
+**Očekivani rezultat:** `✅ USPEH: Isplata od 3000.00 uspešno izvršena.`
+
+**Provera (opcija 1):** Stanje mora biti `7000.00 rsd`.
+
+**Pregled istorije (opcija 5):**
+```
+>>> 5
+```
+**Očekivani rezultat:** Tabela sa dve transakcije — uplata `+10000.00` i isplata `-3000.00`.
+
+---
+
+## TEST 5 — Klijent: Transfer između računa (Pera Perić)
+
+Pera ima dva računa (tekući i štedni), idealan za test transfera.
+
+**Prijava:**
+```
+>>> 1
+Korisničko ime: pera
 Lozinka: pera123
+```
 
-Pregled stanja (Opcija 1):
+**Pregled računa (opcija 1):**
+```
+>>> 1
+```
+Zapiši ID tekućeg (RSD) i štednog (EUR) računa.
 
-Trebalo bi da vidiš svoj novi račun sa stanjem 0.00.
+**Transfer (opcija 4):**
+```
+>>> 4
+ID izvornog računa: <ID tekućeg>
+ID ciljnog računa: <ID štednog>
+Iznos transfera: 5000
+```
+**Očekivani rezultat:** `✅ USPEH: Transfer od 5000.00 uspešno izvršen.`
 
-Uplata (Opcija 2):
+**Provera (opcija 1):** Tekući mora imati `45000.00 rsd`, štedni `10000.00 eur` (transfer ne konvertuje valutu).
 
-Unesi ID računa (vidiš ga u pregledu stanja).
+---
 
-Iznos: 5000
+## TEST 6 — Radnik: Blokiranje računa
 
-Provera: Opet izaberi opciju 1. Stanje sada mora biti 5000.00.
+**Prijava kao radnik1**, pa izaberi opciju 2:
+```
+>>> 2
+ID računa za blokiranje: <ID Nikolinog računa>
+```
+**Očekivani rezultat:** `✅ USPEH: Račun je uspešno blokiran.`
 
-Odjava: Izaberi 0.
-------------------------------
+**Provera — prijavi se kao Nikola i pokušaj isplatu (opcija 3):**
+```
+>>> 3
+ID računa: <isti ID>
+Iznos isplate: 100
+```
+**Očekivani rezultat:** `❌ GREŠKA: Nije dozvoljena isplata. Račun je trenutno BLOKIRAN.`
 
+**Provera — uplata na blokiran račun (opcija 2):**
+Uplata treba da prođe — blokiran račun prima uplate, ali ne dozvoljava isplate.
 
-3. Korak: Direktor (Izveštaji)
-Ovo je trenutak istine za našu get_all popravku.
+---
 
-Prijava: Izaberi 1.
+## TEST 7 — Radnik: Odblokiranje računa
 
-Username: direktor
+**Prijava kao radnik1**, pa opcija 4:
+```
+>>> 4
+ID računa za odblokiranje: <ID Nikolinog računa>
+```
+**Očekivani rezultat:** `✅ USPEH: Račun je uspešno odblokiran.`
 
+**Provera — prijavi se kao Nikola i pokušaj isplatu ponovo.** Sad mora proći.
+
+---
+
+## TEST 8 — Direktor: Pregledi i izveštaji
+
+**Prijava:**
+```
+>>> 1
+Korisničko ime: admin
 Lozinka: admin123
+```
 
-Pregled klijenata (Opcija 4):
+**Pregled svih računa (opcija 1):**
+Tabela sa svim računima svih klijenata, vlasnicima, stanjima i statusima.
 
-Ako vidiš Peru Perića na spisku, SQLiteKorisnikRepo.get_all() radi savršeno.
+**Pregled svih transakcija (opcija 2):**
+Sve transakcije iz sistema — uplate zeleno `+`, isplate crveno `-`.
 
-Pregled svih računa (Opcija 1):
+**Pregled klijenata (opcija 4):**
+Lista svih klijenata sa ID-evima — mora biti vidljiv i Nikola (registrovan u testu 1).
 
-Ako vidiš Perin račun i njegovo stanje, SQLiteRacunRepo.get_all() radi savršeno.
+**Izveštaj po valutama (opcija 6):**
+Zbir svih stanja grupisanih po valuti. Nakon testova mora biti drugačije od početnih vrednosti:
+- RSD: promenjen (uplate/isplate/transferi)
+- EUR: `10000.00` (štedni Perin, nije menjan)
 
-Izveštaj po valutama (Opcija 6):
+**Blokiranje (opcija 3) i odblokiranje (opcija 5):**
+Isto kao radnikove opcije 2 i 4 — unosi se ID računa.
 
-Trebalo bi da vidiš RSD: 5000.00
+---
 
+## TEST 9 — Negativni scenariji (greške)
+
+| Akcija | Očekivana greška |
+|---|---|
+| Pogrešna lozinka pri prijavi | `❌ GREŠKA: Neispravno korisničko ime ili lozinka.` |
+| Isplata veća od stanja (bez dozvoljenog minusa) | `❌ GREŠKA: Nedovoljno sredstava na računu.` |
+| Isplata sa blokiranog računa | `❌ GREŠKA: Nije dozvoljena isplata. Račun je trenutno BLOKIRAN.` |
+| Registracija sa već zauzetim username-om | `❌ GREŠKA: Korisničko ime '...' je već zauzeto.` |
+| Unos tuđeg ID računa pri uplati/isplati | `❌ GREŠKA: Račun ne pripada vašem nalogu.` |
+| Transfer ako klijent ima samo 1 račun | `Potrebna su najmanje dva računa za transfer.` |
+
+---
+
+## Napomene
+
+- Podaci se čuvaju u `banka.db` — sve izmene ostaju i posle restarta.
+- Za reset na početno stanje: obrišite `banka.db` i ponovo pokrenite `python main.py`.
 
 

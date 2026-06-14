@@ -39,6 +39,7 @@ def isplatiti_sa_provizijom(provizija: float):
 
     return decorator
 
+
 # ENTRY POINT TEST -
 
 if __name__ == "__main__":

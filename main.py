@@ -2,9 +2,13 @@
 main.py — Ulazna tačka bankarskog CLI sistema.
 💭 Pokreće inicijalizaciju SQLite baze, zatim glavnu CLI petlju i prepušta kontrolu prezentacionom sloju.
 """
+
 import sys
 from repository.sqlite import init_db, seed_data
 from cli.app import CLIApp
+import os
+os.system("")  # Aktivira ANSI escape codes u Windows terminalu
+
 
 def main() -> None:
     """Inicijalizuje bazu i pokreće glavnu CLI aplikaciju."""
@@ -20,6 +24,7 @@ def main() -> None:
         # ⚠️ Hvatanje neočekivanih kritičnih grešaka na nivou celog sistema
         print(f"Kritična greška sistema: {e}", file=sys.stderr)
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()
