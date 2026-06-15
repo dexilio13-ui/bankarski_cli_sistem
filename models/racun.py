@@ -12,6 +12,7 @@ from uuid import uuid4, UUID
 
 from models.enums import TipRacuna, Valuta, StatusRacuna
 
+
 @dataclass
 class Racun:
     """Predstavlja bankovni račun klijenta.
@@ -32,7 +33,7 @@ class Racun:
     _TRANZICIJE: ClassVar[dict[StatusRacuna, list[StatusRacuna]]] = {
         StatusRacuna.AKTIVAN: [StatusRacuna.BLOKIRAN, StatusRacuna.ZATVOREN],
         StatusRacuna.BLOKIRAN: [StatusRacuna.AKTIVAN, StatusRacuna.ZATVOREN],
-        StatusRacuna.ZATVOREN: []
+        StatusRacuna.ZATVOREN: [],
     }
 
     vlasnik_id: UUID
@@ -64,6 +65,8 @@ class Racun:
         # Provera da li je prelaz dozvoljen prema tranzicionoj mapi
         dozvoljeni = self._TRANZICIJE.get(self.status, [])
         if novi_status not in dozvoljeni:
-            raise ValueError(f"Nedozvoljen prelaz iz {self.status.value} u {novi_status.value}")
+            raise ValueError(
+                f"Nedozvoljen prelaz iz {self.status.value} u {novi_status.value}"
+            )
 
         self.status = novi_status

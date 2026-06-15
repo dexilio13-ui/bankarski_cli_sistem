@@ -36,6 +36,7 @@ class EventBus:
         for callback in self._subscribers.get(event_name, []):
             callback(*args, **kwargs)
 
+
 # ENTRY POINT TEST
 
 if __name__ == "__main__":
@@ -46,7 +47,9 @@ if __name__ == "__main__":
         print(f"[LOG] Transakcija na računu {racun_id}, iznos: {iznos}")
 
     def notify_event(racun_id, iznos):
-        print(f"[NOTIFY] Klijentu šaljemo obaveštenje o transakciji {iznos} na računu {racun_id}")
+        print(
+            f"[NOTIFY] Klijentu šaljemo obaveštenje o transakciji {iznos} na računu {racun_id}"
+        )
 
     # Pretplaćujemo se na događaj "transakcija_izvršena"
     bus.subscribe("transakcija_izvršena", log_event)

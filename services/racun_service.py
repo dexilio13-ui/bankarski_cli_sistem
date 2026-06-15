@@ -15,7 +15,7 @@ from core.exceptions import NedovoljnoSredstavaError, StatusRacunaError
 
 # Tip-only import za EventBus da bi mypy znao tip, bez runtime importa
 if TYPE_CHECKING:
-    from core.events import EventBus  # type: ignore
+    pass  # type: ignore
 
 # U runtimeu EventBus može, ali ne mora postojati; koristimo Optional[Any] za mypy
 EventBusType = Optional[Any]
@@ -28,7 +28,7 @@ class RacunService:
         self,
         racun_repo: RacunRepo,
         transakcija_repo: Optional[TransakcijaRepo] = None,
-        event_bus: EventBusType = None
+        event_bus: EventBusType = None,
     ) -> None:
         """Dependency Injection — repozitorijumi i opcionalni EventBus se ubacuju spolja."""
         self.racun_repo = racun_repo
@@ -75,7 +75,9 @@ class RacunService:
 
         # 📝 Beleženje transakcije u bazu
         if self.transakcija_repo is not None:
-            nova_transakcija = Transakcija(racun_id=racun_id, iznos=iznos, tip=TipTransakcije.UPLATA)
+            nova_transakcija = Transakcija(
+                racun_id=racun_id, iznos=iznos, tip=TipTransakcije.UPLATA
+            )
             self.transakcija_repo.save(nova_transakcija)
 
         if self._event_bus is not None:
@@ -87,7 +89,9 @@ class RacunService:
 
         # 🛡️ State Pattern: BLOKIRAN i ZATVOREN račun ne dozvoljavaju isplate (odliv)
         if racun.status == StatusRacuna.BLOKIRAN:
-            raise StatusRacunaError("Nije dozvoljena isplata. Račun je trenutno BLOKIRAN.")
+            raise StatusRacunaError(
+                "Nije dozvoljena isplata. Račun je trenutno BLOKIRAN."
+            )
         if racun.status == StatusRacuna.ZATVOREN:
             raise StatusRacunaError("Nije dozvoljena isplata. Račun je ZATVOREN.")
 
@@ -103,7 +107,9 @@ class RacunService:
 
         # 📝 Beleženje transakcije u bazu
         if self.transakcija_repo is not None:
-            nova_transakcija = Transakcija(racun_id=racun_id, iznos=iznos, tip=TipTransakcije.ISPLATA)
+            nova_transakcija = Transakcija(
+                racun_id=racun_id, iznos=iznos, tip=TipTransakcije.ISPLATA
+            )
             self.transakcija_repo.save(nova_transakcija)
 
         if self._event_bus is not None:
@@ -111,7 +117,7 @@ class RacunService:
 
     def transfer(self, izvor_id: UUID, cilj_id: UUID, iznos: float) -> None:
         """Prenosi sredstva sa jednog računa na drugi uz striktne provere statusa."""
-        izvor = self._dohvati_racun_ili_baci (izvor_id)
+        izvor = self._dohvati_racun_ili_baci(izvor_id)
         cilj = self._dohvati_racun_ili_baci(cilj_id)
 
         # 🛡️ State Pattern: Izvor (odliv sredstava) ne sme biti BLOKIRAN ni ZATVOREN
@@ -136,13 +142,19 @@ class RacunService:
 
         # 📝 Beleženje transakcije u bazu za oba računa
         if self.transakcija_repo is not None:
-            transakcija_izvor = Transakcija(racun_id=izvor_id, iznos=iznos, tip=TipTransakcije.TRANSFER)
-            transakcija_cilj = Transakcija(racun_id=cilj_id, iznos=iznos, tip=TipTransakcije.TRANSFER)
+            transakcija_izvor = Transakcija(
+                racun_id=izvor_id, iznos=iznos, tip=TipTransakcije.TRANSFER
+            )
+            transakcija_cilj = Transakcija(
+                racun_id=cilj_id, iznos=iznos, tip=TipTransakcije.TRANSFER
+            )
             self.transakcija_repo.save(transakcija_izvor)
             self.transakcija_repo.save(transakcija_cilj)
 
         if self._event_bus is not None:
-            self._event_bus.emit("transfer_izvrsen", izvor=izvor, cilj=cilj, iznos=iznos)
+            self._event_bus.emit(
+                "transfer_izvrsen", izvor=izvor, cilj=cilj, iznos=iznos
+            )
 
     def blokiraj_racun(self, racun_id: UUID) -> None:
         """Postavlja status računa na BLOKIRAN."""

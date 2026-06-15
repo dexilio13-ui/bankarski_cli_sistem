@@ -11,6 +11,7 @@ from models.racun import Racun
 # Strategije obračuna kamate
 # -------------------------------
 
+
 class KamataStrategy(ABC):
     """Apstraktna strategija za obračun kamate."""
 
@@ -49,6 +50,7 @@ class SlozenaKamata(KamataStrategy):
 # -------------------------------
 # Servis koji koristi strategije
 # -------------------------------
+
 
 class KamataService:
     """Servis za obračun kamate koristeći izabranu strategiju."""

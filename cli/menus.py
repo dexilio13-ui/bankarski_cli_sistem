@@ -4,10 +4,7 @@ cli/menus.py — Definicije menija za različite uloge u sistemu.
     funkciji `prikazi_meni_opcije` iz views.py bez prljanja glavne logike.
 """
 
-GLAVNI_MENI = {
-    "1": "Prijava na sistem",
-    "0": "Izlaz iz aplikacije"
-}
+GLAVNI_MENI = {"1": "Prijava na sistem", "0": "Izlaz iz aplikacije"}
 
 KLIJENT_MENI = {
     "1": "Pregled računa i stanja",
@@ -15,7 +12,7 @@ KLIJENT_MENI = {
     "3": "Isplata sa sopstvenog računa",
     "4": "Transfer između sopstvenih računa",
     "5": "Pregled istorije transakcija",
-    "0": "Odjava"
+    "0": "Odjava",
 }
 
 RADNIK_MENI = {
@@ -24,7 +21,7 @@ RADNIK_MENI = {
     "3": "Registracija novog klijenta",
     "4": "Odblokiranje računa",
     "5": "Pregled klijenata i njihovih računa",
-    "0": "Odjava"
+    "0": "Odjava",
 }
 
 DIREKTOR_MENI = {
@@ -34,5 +31,5 @@ DIREKTOR_MENI = {
     "4": "Pregled liste svih klijenata",
     "5": "Odblokiranje računa",
     "6": "Izveštaj o ukupnom stanju banke (po valutama)",
-    "0": "Odjava"
+    "0": "Odjava",
 }
