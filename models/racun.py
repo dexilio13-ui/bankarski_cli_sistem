@@ -8,9 +8,9 @@ models/racun.py — Model računa sa ispravljenim State pattern-om (ClassVar).
 
 from dataclasses import dataclass, field
 from typing import ClassVar
-from uuid import uuid4, UUID
+from uuid import UUID, uuid4
 
-from models.enums import TipRacuna, Valuta, StatusRacuna
+from models.enums import StatusRacuna, TipRacuna, Valuta
 
 
 @dataclass

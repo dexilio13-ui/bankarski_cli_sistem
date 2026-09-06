@@ -5,20 +5,17 @@ services/racun_service.py — Servis za upravljanje računima (uplata, isplata, 
     poštuju restrikcije statusa računa (State pattern) i da se kreiranje vrši kroz Factory logiku.
 """
 
-from typing import Optional, TYPE_CHECKING, Any
+from typing import Any
 from uuid import UUID
-from repository.interfaces import RacunRepo, TransakcijaRepo
+
+from core.exceptions import NedovoljnoSredstavaError, StatusRacunaError
+from models.enums import StatusRacuna, TipRacuna, TipTransakcije, Valuta
 from models.racun import Racun
 from models.transakcija import Transakcija
-from models.enums import StatusRacuna, TipRacuna, Valuta, TipTransakcije
-from core.exceptions import NedovoljnoSredstavaError, StatusRacunaError
+from repository.interfaces import RacunRepo, TransakcijaRepo
 
-# Tip-only import za EventBus da bi mypy znao tip, bez runtime importa
-if TYPE_CHECKING:
-    pass  # type: ignore
-
-# U runtimeu EventBus može, ali ne mora postojati; koristimo Optional[Any] za mypy
-EventBusType = Optional[Any]
+# U runtimeu EventBus može, ali ne mora postojati; zato je tip `Any | None`.
+EventBusType = Any | None
 
 
 class RacunService:
@@ -27,7 +24,7 @@ class RacunService:
     def __init__(
         self,
         racun_repo: RacunRepo,
-        transakcija_repo: Optional[TransakcijaRepo] = None,
+        transakcija_repo: TransakcijaRepo | None = None,
         event_bus: EventBusType = None,
     ) -> None:
         """Dependency Injection — repozitorijumi i opcionalni EventBus se ubacuju spolja."""
@@ -37,7 +34,7 @@ class RacunService:
 
     def _dohvati_racun_ili_baci(self, racun_id: UUID) -> Racun:
         """Pomoćna metoda koja dohvaća račun i baca ValueError ako ne postoji."""
-        racun: Optional[Racun] = self.racun_repo.get_by_id(racun_id)
+        racun: Racun | None = self.racun_repo.get_by_id(racun_id)
         if racun is None:
             raise ValueError(f"Račun sa ID {racun_id} ne postoji.")
         return racun
@@ -57,7 +54,7 @@ class RacunService:
         if self._event_bus is not None:
             try:
                 self._event_bus.emit("racun_otvoren", racun=racun)
-            except Exception:
+            except Exception:  # noqa: BLE001, S110 — pretplatnici ne smeju da obore kreiranje računa
                 pass
 
         return racun

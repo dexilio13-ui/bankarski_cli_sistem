@@ -5,7 +5,9 @@
 """
 
 from dataclasses import dataclass, field
-from uuid import uuid4, UUID
+from uuid import UUID, uuid4
+
+from core.security import lozinka_je_ispravna
 from models.enums import Uloga
 
 
@@ -24,8 +26,8 @@ class Korisnik:
     id: UUID = field(default_factory=uuid4)
 
     def proveri_lozinku(self, lozinka: str) -> bool:
-        # 💭 Zašto: U fazi 1 plain-text, u fazi 3 zamijeniti sa hash validacijom.
-        return self.password == lozinka
+        # 💭 Zašto: U fazi 1 plain-text, u fazi 3 prelazak na SHA-256 hash validaciju.
+        return lozinka_je_ispravna(lozinka, self.password)
 
 
 @dataclass

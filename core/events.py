@@ -5,7 +5,7 @@ core/events.py — EventBus implementacija (Observer pattern).
     i budu obavešteni kada se oni dese.
 """
 
-from typing import Callable, Dict, List
+from collections.abc import Callable
 
 
 class EventBus:
@@ -13,7 +13,7 @@ class EventBus:
 
     def __init__(self) -> None:
         # Dict gde je ključ ime događaja, a vrednost lista callback funkcija
-        self._subscribers: Dict[str, List[Callable]] = {}
+        self._subscribers: dict[str, list[Callable]] = {}
 
     def subscribe(self, event_name: str, callback: Callable) -> None:
         """

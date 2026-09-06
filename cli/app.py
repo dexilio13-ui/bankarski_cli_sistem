@@ -1,16 +1,17 @@
 import sys
 from uuid import UUID
+
 from rich.console import Console
 from rich.table import Table
 
+from cli import menus, views
 from core.exceptions import AutentifikacijaError
+from core.security import hesiraj_lozinku
+from models.enums import TipRacuna, Uloga, Valuta
+from models.korisnik import Klijent, Korisnik
 from repository.sqlite import SQLiteKorisnikRepo, SQLiteRacunRepo, SQLiteTransakcijaRepo
 from services.auth_service import AuthService
 from services.racun_service import RacunService
-from models.korisnik import Korisnik, Klijent
-from models.enums import Uloga, TipRacuna, Valuta
-from cli import views, menus
-
 
 console = Console(force_terminal=True, force_jupyter=False, color_system="256")
 
@@ -33,7 +34,7 @@ class CLIApp:
                     "\n[bold green]Hvala na korišćenju aplikacije![/bold green]"
                 )
                 break
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001 — namerno: prikazujemo grešku korisniku
                 views.prikazi_gresku(f"Neočekivana greška: {e}")
 
     def _glavna_petlja(self) -> None:
@@ -112,7 +113,7 @@ class CLIApp:
 
             r = self.racun_svc.otvori_racun(v_id, tip_mapa[tip_str], val_mapa[val_str])
             views.prikazi_uspeh(f"Uspešno otvoren račun: {r.id}")
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 — namerno: prikazujemo grešku korisniku
             views.prikazi_gresku(f"Greška: {e}")
 
     def _radnik_registruj_klijenta(self) -> None:
@@ -128,10 +129,10 @@ class CLIApp:
             if self.repo_korisnici.get_by_username(username) is not None:
                 raise ValueError(f"Korisničko ime '{username}' je već zauzeto.")
 
-            novi_klijent = Klijent(ime=ime, prezime=prezime, username=username, password=lozinka)
+            novi_klijent = Klijent(ime=ime, prezime=prezime, username=username, password=hesiraj_lozinku(lozinka))
             self.repo_korisnici.save(novi_klijent)
             views.prikazi_uspeh(f"Klijent registrovan! ID: {novi_klijent.id}")
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 — namerno: prikazujemo grešku korisniku
             views.prikazi_gresku(f"Greška: {e}")
 
     def _radnik_blokiraj_racun(self) -> None:
@@ -139,7 +140,7 @@ class CLIApp:
             racun_id = UUID(input("ID računa za blokiranje: ").strip())
             self.racun_svc.blokiraj_racun(racun_id)
             views.prikazi_uspeh("Račun je uspešno blokiran.")
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 — namerno: prikazujemo grešku korisniku
             views.prikazi_gresku(f"Greška: {e}")
 
     def _radnik_odblokiraj_racun(self) -> None:
@@ -147,7 +148,7 @@ class CLIApp:
             racun_id = UUID(input("ID računa za odblokiranje: ").strip())
             self.racun_svc.odblokiraj_racun(racun_id)
             views.prikazi_uspeh("Račun je uspešno odblokiran.")
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 — namerno: prikazujemo grešku korisniku
             views.prikazi_gresku(f"Greška: {e}")
 
     def _radnik_pregled_svih(self) -> None:
@@ -266,7 +267,7 @@ class CLIApp:
             racun_id = UUID(input("ID računa za blokiranje: ").strip())
             self.racun_svc.blokiraj_racun(racun_id)
             views.prikazi_uspeh("Račun je uspešno blokiran.")
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 — namerno: prikazujemo grešku korisniku
             views.prikazi_gresku(f"Greška: {e}")
 
     def _direktor_odblokiraj_racun(self) -> None:
@@ -274,7 +275,7 @@ class CLIApp:
             racun_id = UUID(input("ID računa za odblokiranje: ").strip())
             self.racun_svc.odblokiraj_racun(racun_id)
             views.prikazi_uspeh("Račun je uspešno odblokiran.")
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 — namerno: prikazujemo grešku korisniku
             views.prikazi_gresku(f"Greška: {e}")
 
     def _direktor_pregled_klijenata(self) -> None:
@@ -370,7 +371,7 @@ class CLIApp:
                 raise ValueError("Iznos mora biti veći od nule.")
             self.racun_svc.uplata(racun_id, iznos)
             views.prikazi_uspeh(f"Uplata od {iznos:.2f} uspešno izvršena.")
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 — namerno: prikazujemo grešku korisniku
             views.prikazi_gresku(f"Greška: {e}")
 
     def _klijent_isplata(self) -> None:
@@ -389,7 +390,7 @@ class CLIApp:
                 raise ValueError("Iznos mora biti veći od nule.")
             self.racun_svc.isplata(racun_id, iznos)
             views.prikazi_uspeh(f"Isplata od {iznos:.2f} uspešno izvršena.")
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 — namerno: prikazujemo grešku korisniku
             views.prikazi_gresku(f"Greška: {e}")
 
     def _klijent_transfer(self) -> None:
@@ -411,7 +412,7 @@ class CLIApp:
                 raise ValueError("Iznos mora biti veći od nule.")
             self.racun_svc.transfer(izvor_id, cilj_id, iznos)
             views.prikazi_uspeh(f"Transfer od {iznos:.2f} uspešno izvršen.")
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 — namerno: prikazujemo grešku korisniku
             views.prikazi_gresku(f"Greška: {e}")
 
     def _klijent_istorija(self) -> None:
