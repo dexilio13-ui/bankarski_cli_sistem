@@ -12,3 +12,7 @@ dev = [
     "pytest>=9.0.3",
     "ruff>=0.15.16",
 ]
+
+[tool.ruff]
+# 💭 Backups su snapshotovi, ne izvorni kod — ne lint-ujemo ih.
+extend-exclude = ["cli/Backup"]

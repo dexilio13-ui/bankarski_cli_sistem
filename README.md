@@ -5,7 +5,7 @@
 ### Sta je uradjeno do sada ###
 -------------------------------
 
-Faza 1 - Zavrseno sve osim: CLI sa Rich bibliotekom za formatirani ispis
+Faza 1 - Zavrsena (ukljucujuci CLI sa Rich bibliotekom za formatirani ispis)
 
 Faza 2 - Zavrsena
 
@@ -21,6 +21,34 @@ cd E:\bankarski_cli_sistem
 .venv\Scripts\activate
 python main.py
 ```
+
+---
+
+## Izgled interfejsa (Rich)
+
+Ceo CLI je formatiran uz pomoć **Rich** biblioteke. Naslov i meniji se prikazuju kao okviri (paneli), a poruke su obojene:
+
+- **Naslov aplikacije** — plavi okvir, žuti tekst
+- **Meniji** — panel sa opcijama, brojevi opcija u cijan boji
+- `✅ USPEH:` — **bold zelena**
+- `❌ GREŠKA:` — **bold crvena**
+- `ℹ️ INFO:` — **bold cijan**
+- **Tabele** (računi, klijenti, transakcije) — Rich tabele sa obojenim iznosima
+
+Primer glavnog menija:
+
+```
+┌─────────────────────────┐
+│ 🏦 BANKARSKI CLI SISTEM │
+└─────────────────────────┘
+┌─── Izaberite opciju ────┐
+│ [1] Prijava na sistem   │
+│ [0] Izlaz iz aplikacije │
+└─────────────────────────┘
+>>>
+```
+
+> Tekst poruka u testovima ispod ostaje isti — promenjen je samo izgled (boje i okviri).
 
 ---
 

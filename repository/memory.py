@@ -7,7 +7,7 @@ repository/memory.py — In-memory implementacija repozitorijuma.
 """
 
 from uuid import UUID
-from typing import List, Optional
+
 from models.korisnik import Korisnik
 from models.racun import Racun
 from models.transakcija import Transakcija
@@ -20,10 +20,10 @@ class MemoryKorisnikRepo(KorisnikRepo):
     def __init__(self) -> None:
         self._storage: dict[UUID, Korisnik] = {}
 
-    def get_by_id(self, korisnik_id: UUID) -> Optional[Korisnik]:
+    def get_by_id(self, korisnik_id: UUID) -> Korisnik | None:
         return self._storage.get(korisnik_id)
 
-    def get_by_username(self, username: str) -> Optional[Korisnik]:
+    def get_by_username(self, username: str) -> Korisnik | None:
         #  iteriramo kroz dict za pronalazak po username
         for k in self._storage.values():
             if k.username == username:
@@ -40,10 +40,10 @@ class MemoryRacunRepo(RacunRepo):
     def __init__(self) -> None:
         self._storage: dict[UUID, Racun] = {}
 
-    def get_by_id(self, racun_id: UUID) -> Optional[Racun]:
+    def get_by_id(self, racun_id: UUID) -> Racun | None:
         return self._storage.get(racun_id)
 
-    def get_by_vlasnik(self, vlasnik_id: UUID) -> List[Racun]:
+    def get_by_vlasnik(self, vlasnik_id: UUID) -> list[Racun]:
         # 💭 Zašto list comprehension: efikasno filtriranje
         return [r for r in self._storage.values() if r.vlasnik_id == vlasnik_id]
 
@@ -55,9 +55,9 @@ class MemoryTransakcijaRepo(TransakcijaRepo):
     """In-memory repozitorijum za transakcije."""
 
     def __init__(self) -> None:
-        self._storage: List[Transakcija] = []
+        self._storage: list[Transakcija] = []
 
-    def get_by_racun(self, racun_id: UUID) -> List[Transakcija]:
+    def get_by_racun(self, racun_id: UUID) -> list[Transakcija]:
         return [t for t in self._storage if t.racun_id == racun_id]
 
     def save(self, transakcija: Transakcija) -> None:

@@ -5,11 +5,12 @@ services/banka.py — Centralna Banka klasa (Singleton).
 🔁 Odabir: Prelazak sa in-memory rečnika na SQLite repozitorijume uz očuvanje Singleton strukture.
 """
 
-from typing import Any
+from typing import Any, ClassVar
 from uuid import UUID
+
+from models.enums import TipRacuna, Valuta
 from models.racun import Racun
 from models.transakcija import Transakcija
-from models.enums import TipRacuna, Valuta
 from repository.sqlite import SQLiteRacunRepo, SQLiteTransakcijaRepo
 
 
@@ -19,7 +20,7 @@ class SingletonMeta(type):
     💭 Zašto ovaj pattern: Projektni zahtev izričito nalaže SingletonMeta.
     """
 
-    _instances: dict[type, Any] = {}
+    _instances: ClassVar[dict[type, Any]] = {}
 
     def __call__(cls, *args: Any, **kwargs: Any) -> Any:
         if cls not in cls._instances:

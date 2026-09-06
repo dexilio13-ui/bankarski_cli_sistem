@@ -4,8 +4,8 @@ services/kamata_service.py — Servis za obračun kamate.
 """
 
 from abc import ABC, abstractmethod
-from models.racun import Racun
 
+from models.racun import Racun
 
 # -------------------------------
 # Strategije obračuna kamate
