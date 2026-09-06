@@ -1,0 +1,10 @@
+# Želimo ignorisati privremene i lokalne artefakte, a ne izvorni kod
+__pycache__/
+*.pyc
+*.pyo
+*.db
+*.bak
+bank.db Backup/
+cli/Backup/
+.idea/
+*.png
