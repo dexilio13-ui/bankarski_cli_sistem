@@ -8,3 +8,7 @@ bank.db Backup/
 cli/Backup/
 .idea/
 *.png
+# Projektni plan fajlovi
+Dodata*
+Faza*
+STRUKTURA*
