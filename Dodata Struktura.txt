@@ -1,0 +1,12 @@
+bankarski_cli_sistem/
+├── migracija_lozinki.py     ← NOV, root projekta
+├── core/
+│   └── security.py          ← NOV
+├── models/
+│   └── korisnik.py          ← izmenjen
+├── repository/
+│   └── sqlite.py             ← izmenjen
+├── services/
+│   └── auth_service.py       ← izmenjen
+└── cli/
+    └── app.py                 ← izmenjen (2 dodate linije)
